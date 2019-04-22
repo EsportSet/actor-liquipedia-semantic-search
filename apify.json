@@ -1,0 +1,8 @@
+{
+  "name": "actor-liquipedia-semantic-search",
+  "version": "0.0",
+  "buildTag": "latest",
+  "env": {
+    "APIFY_HEADLESS": 0
+  }
+}

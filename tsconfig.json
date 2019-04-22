@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "diagnostics": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "lib": ["es5", "es6", "es7", "dom", "dom.iterable"],
+    "module": "commonjs",
+    "target": "esnext",
+    "moduleResolution": "node",
+    "noImplicitAny": false,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "outDir": "dist/",
+    "pretty": true,
+    "removeComments": true,
+    "strict": true,
+    "declaration": true
+  },
+  "exclude": [
+    "src/**/*.spec.*",
+    "node_modules",
+    "**/__tests__/*",
+    "**/__mocks__/*",
+    "**/__mockData__/*"
+  ],
+  "include": ["src", "typings"]
+}
