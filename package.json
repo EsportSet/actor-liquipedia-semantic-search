@@ -12,9 +12,9 @@
   "main": "dist/main.js",
   "types": "dist/main.d.ts",
   "scripts": {
+    "apify-storage-clean": "rimraf apify_storage/datasets && rimraf apify_storage/request_queues",
     "build": "tsc",
     "clean": "rimraf dist",
-    "apify-storage-clean": "rimraf apify_storage/datasets && rimraf apify_storage/request_queues",
     "lint": "eslint --fix \"src/**/*.{ts,tsx,js,jsx}\"",
     "local-start": "npm run clean && npm run build && node dist/main.js",
     "local-start-fresh": "npm run apify-storage-clean && npm run local-start",
@@ -41,6 +41,7 @@
   "dependencies": {
     "apify": "^0.13.4",
     "normalize-url": "^4.3.0",
+    "tabletojson": "^1.0.4",
     "typescript": "^3.4.3"
   },
   "devDependencies": {
@@ -49,6 +50,7 @@
     "@types/expect-puppeteer": "^3.3.1",
     "@types/jest": "^24.0.11",
     "@types/jest-environment-puppeteer": "^4.0.0",
+    "@types/jquery": "^3.3.29",
     "@types/jsdom": "^12.2.3",
     "@types/lodash": "^4.14.123",
     "@types/node": "^11.13.4",
