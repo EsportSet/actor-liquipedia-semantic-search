@@ -40,10 +40,12 @@
   },
   "dependencies": {
     "apify": "^0.13.4",
+    "got": "^9.6.0",
     "normalize-url": "^4.3.0",
     "typescript": "^3.4.3"
   },
   "devDependencies": {
+    "@types/got": "^9.4.3",
     "@babel/preset-env": "^7.4.3",
     "@babel/preset-typescript": "^7.3.3",
     "@types/expect-puppeteer": "^3.3.1",

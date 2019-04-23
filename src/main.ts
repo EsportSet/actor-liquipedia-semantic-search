@@ -1,7 +1,9 @@
 import Apify from 'apify';
+import got from 'got';
 import normalizeUrl from 'normalize-url';
 import { Page } from 'puppeteer';
 
+import scrapJsonSaveLink from './scrap-json-save-link';
 import scrapNextLink from './scrap-next-link';
 
 /**
@@ -51,6 +53,7 @@ async function gotoFunctionModified({
   await page.goto(request.url, { timeout: 100000 });
 }
 
+/* eslint-disable sonarjs/cognitive-complexity */
 Apify.main(
   async (): Promise<void> => {
     const inputRaw = await Apify.getValue('INPUT');
@@ -60,15 +63,13 @@ Apify.main(
     if (typeof inputRaw.startUrl !== 'string') {
       throw new TypeError('input.startUrl must an string!');
     }
-    if (!/.*webdesignernews\.com.*/.test(inputRaw.startUrl))
-      throw new Error('input.startUrl not a webdesignernews.com !');
     //
     const startUrlNorm = normalizeUrl(inputRaw.startUrl, { forceHttps: true });
     const input = Object.assign(inputRaw, { startUrl: startUrlNorm });
 
     const requestQueue = await Apify.openRequestQueue();
     await requestQueue.addRequest({
-      url: input.url
+      url: input.startUrl
     });
 
     const crawler = new Apify.PuppeteerCrawler({
@@ -106,8 +107,7 @@ Apify.main(
         }),
       //
       handlePageFunction: async ({
-        page,
-        request
+        page
       }: {
         page: Page;
         request: any;
@@ -115,7 +115,13 @@ Apify.main(
         // added delay not to crawl too fast
         await page.waitFor(Math.floor(Math.random() * 5000) + 1000);
         //
-        // save JSON file
+        // get JSON file wish got lib
+        const jsonSaveUrl = await scrapJsonSaveLink(page);
+        if (jsonSaveUrl) {
+          const response = await got.get(jsonSaveUrl, { json: true });
+          const jsonArray = await Object.values(response.body.results);
+          await Apify.pushData(jsonArray);
+        }
         //
         const nextLink = await scrapNextLink(page);
         if (nextLink) {
@@ -123,8 +129,6 @@ Apify.main(
             url: nextLink
           });
         }
-        //
-        // await Apify.pushData(pageTableObjectsFinal);
       },
       handleFailedRequestFunction: async ({ request }): Promise<void> => {
         await Apify.pushData({
