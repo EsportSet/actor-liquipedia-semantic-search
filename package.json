@@ -41,7 +41,6 @@
   "dependencies": {
     "apify": "^0.13.4",
     "normalize-url": "^4.3.0",
-    "tabletojson": "^1.0.4",
     "typescript": "^3.4.3"
   },
   "devDependencies": {
