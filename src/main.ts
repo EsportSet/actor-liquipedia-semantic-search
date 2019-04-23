@@ -114,10 +114,16 @@ Apify.main(
       }): Promise<void> => {
         // added delay not to crawl too fast
         await page.waitFor(Math.floor(Math.random() * 5000) + 1000);
+        //
+        // save JSON file
+        //
         const nextLink = await scrapNextLink(page);
-        await requestQueue.addRequest({
-          url: nextLink
-        });
+        if (nextLink) {
+          await requestQueue.addRequest({
+            url: nextLink
+          });
+        }
+        //
         // await Apify.pushData(pageTableObjectsFinal);
       },
       handleFailedRequestFunction: async ({ request }): Promise<void> => {
