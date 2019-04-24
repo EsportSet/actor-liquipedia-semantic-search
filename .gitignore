@@ -54,3 +54,7 @@ apify_storage
 
 # docker
 .npmrc
+
+# personal
+personal.md
+personal
