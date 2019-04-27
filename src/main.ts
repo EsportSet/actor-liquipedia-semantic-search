@@ -58,21 +58,27 @@ Apify.main(
   async (): Promise<void> => {
     const inputRaw = await Apify.getValue('INPUT');
     //
-    if (!inputRaw.startUrl)
-      throw new Error('Attribute startUrl missing in input.');
-    if (typeof inputRaw.startUrl !== 'string') {
-      throw new TypeError('input.startUrl must an string!');
-    }
+    if (!inputRaw.startUrls)
+      throw new Error('Attribute startUrls missing in input.');
     //
-    const startUrlNorm = normalizeUrl(inputRaw.startUrl, { forceHttps: true });
-    const input = Object.assign(inputRaw, { startUrl: startUrlNorm });
-
-    const requestQueue = await Apify.openRequestQueue();
-    await requestQueue.addRequest({
-      url: input.startUrl
+    const startUrlsNorm: { url: string }[] = inputRaw.startUrls.map(
+      (object: { url: string }): { url: string } => {
+        return Object.assign(object, { url: normalizeUrl(object.url) });
+      }
+    );
+    const input = Object.assign(inputRaw, {
+      startUrls: startUrlsNorm
     });
+    //
+    const requestQueue = await Apify.openRequestQueue();
+
+    const requestList = new Apify.RequestList({
+      sources: input.startUrls
+    });
+    await requestList.initialize();
 
     const crawler = new Apify.PuppeteerCrawler({
+      requestList,
       requestQueue,
       //
       maxRequestRetries: input.maxRequestRetries ? input.maxRequestRetries : 3,
