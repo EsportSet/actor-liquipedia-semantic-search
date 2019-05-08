@@ -3,6 +3,7 @@ import got from 'got';
 import normalizeUrl from 'normalize-url';
 import { Page } from 'puppeteer';
 
+import playerFilter from './player-filter';
 import scrapJsonSaveLink from './scrap-json-save-link';
 import scrapNextLink from './scrap-next-link';
 
@@ -51,6 +52,31 @@ async function gotoFunctionModified({
   const userAgent = Apify.utils.getRandomUserAgent();
   await page.setUserAgent(userAgent);
   await page.goto(request.url, { timeout: 100000 });
+}
+
+function getRandomInt(min: number, max: number): number {
+  return Math.floor(Math.random() * (max - min)) + min;
+}
+
+function proxyUrlFromInput(input: {
+  proxyConfiguration: { useApifyProxy: boolean; proxyUrls: string[] };
+}): string {
+  try {
+    if (
+      input &&
+      input.proxyConfiguration &&
+      !input.proxyConfiguration.useApifyProxy &&
+      input.proxyConfiguration.proxyUrls
+    ) {
+      const proxyArray = input.proxyConfiguration.proxyUrls;
+      const proxy = proxyArray[getRandomInt(0, proxyArray.length - 1)];
+      return proxy;
+    } else {
+      return '';
+    }
+  } catch (error) {
+    return '';
+  }
 }
 
 /* eslint-disable sonarjs/cognitive-complexity */
@@ -103,12 +129,13 @@ Apify.main(
       //
       launchPuppeteerFunction: async (): Promise<void> =>
         Apify.launchPuppeteer({
-          headless: input.headless ? input.headless : false,
+          headless: input.headless ? input.headless : true,
           useApifyProxy:
             input.proxyConfiguration && input.proxyConfiguration.useApifyProxy
               ? input.proxyConfiguration.useApifyProxy
               : false,
           userAgent: await Apify.utils.getRandomUserAgent(),
+          proxyUrl: proxyUrlFromInput(input),
           liveView: input.liveView ? input.liveView : false
         }),
       //
@@ -126,7 +153,10 @@ Apify.main(
         if (jsonSaveUrl) {
           const response = await got.get(jsonSaveUrl, { json: true });
           const jsonArray = await Object.values(response.body.results);
-          await Apify.pushData(jsonArray);
+          const filteredJsonArray = jsonArray.filter(
+            (player): any => playerFilter(player, input.playersFilter)
+          );
+          await Apify.pushData(filteredJsonArray);
         }
         //
         const nextLink = await scrapNextLink(page);
